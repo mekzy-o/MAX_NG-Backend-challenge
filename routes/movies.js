@@ -1,67 +1,56 @@
 const express = require('express');
-const request = require('request');
-const rp = require('request-promise');
 const fetch = require('node-fetch');
 const router = express.Router();
 const sortByReleaseDate = require('../utils/sortByReleaseDate');
+const {sortByAscending, sortByDescending } = require('../utils/sortCharacters');
 
 /* GET movies listing. */
 router.get('/', (_, res, next) => {
-   const moviesUrl = 'https://swapi.dev/api/films/'
-   request(moviesUrl, function(error, response, body){
-     try{
-       const results = JSON.parse(body).results;
-        return res.status(response.statusCode).json({
-           success: error ? false : true,
-           error: error ? true : false,
-           message: error ? error.message: 'Movies fetched successfully!',
-           data: error ? null: results.sort(sortByReleaseDate)
-        })
-      }
-     catch({message}){
+   const moviesUrl = 'https://swapi.dev/api/films/';
+   fetch(moviesUrl).then(result => result.json()).then(result => {
+     const { results } = result;
+     const transformedResults = results.map(({title, episode_id, opening_crawl, release_date}) => ({title, episode_id, opening_crawl, comment:0, release_date}));
+    return res.status(200).json({
+      success: true,
+      error: false,
+      message: 'Movies fetched successfully!',
+      data: transformedResults.sort(sortByReleaseDate)
+   })}).
+     catch((error) => {
       res.status(400).json({
-        message,
+        message: error.message,
         status: 'error',
         data: null,
       });
-    }
-  });
-    
+    })
+
 });
 
 
-router.get('/:id/characters', (req, res, next) => {
-  const moviesUrl = 'https://swapi.dev/api/films/';
+router.get('/:id/characters', (req, res) => {
   const {id} = req.params;
+  const moviesUrl = `https://swapi.dev/api/films/${id}`;
   const {sortBy, orderBy, gender} = req.query;
+  fetch(moviesUrl).then(result => result.json()).then(result => {
 
-  const fetchMovies  = fetch(moviesUrl).then(res => res.json()).then(json => json.results);
-  const characterResultsURL = fetchMovies.then(res => res.filter(item => item['episode_id'] == id).map(item => item.characters));
-  const fetchCharacterResults = characterResultsURL.then(item => item[0].map(item => fetch(item)))
-  fetchCharacterResults.then(res => Promise.all(res)).then(res => res).then(res => Promise.all(res.map(res => res.json())))
-  .then(res => {
+    Promise.all(result.characters.map(character => fetch(character).then(res => res.json())))
+    .then((results) => {
+       results = results.map(({name, height, gender, url, created}) => ({name, height:Number(height), gender, url, created}));
       if(!!(sortBy && orderBy)){
-      res = orderBy =='ASC' ? res.sort(sortByAscending(sortBy)) : res.sort(sortByDescending(sortBy))
-      };
+         results = orderBy =='ASC' ? results.sort(sortByAscending(sortBy)) : results.sort(sortByDescending(sortBy))
+        };
       if(gender){
-          res = res.filter((character) => character.gender == gender)
+        results = results.filter((item) => item.gender == gender);
       }
-      return {
-         success: true,
-         error: false,
-         message: 'Characters List fetched successfully!',
-         data: res
-      }
-  }).catch(error => {
-    res.status(400).json({
-      message: error.message,
-      status: 'error',
-      data: null,
+      res.status(200).json({
+        sucess: true,
+        data: results,
+      })
     });
-  })
-
+  }).catch(error => console.log(error));
  });
    
+
 
 
 module.exports = router;
