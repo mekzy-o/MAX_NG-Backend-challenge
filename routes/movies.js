@@ -73,7 +73,16 @@ router.get("/:id/characters", (req, res) => {
           success: true,
           error: false,
           message: "Movie Characters fetched successfully!",
-          data: results,
+          data: {
+            metadata: {
+              total_characters: results.length,
+              total_height: results.reduce(
+                (accumulator, current) => accumulator + current.height,
+                0
+              ),
+            },
+            results,
+          },
         });
       });
     })
