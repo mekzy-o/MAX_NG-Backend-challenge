@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const env = process.env.ENV || process.env.NODE_ENV;
 
@@ -6,9 +6,9 @@ console.log(env);
 
 const dbConfig = {
   test: {
-    user: 'postgres',
-    database: 'testdb',
-    password: '',
+    user: "postgres",
+    database: "testdb",
+    password: "",
   },
   dev: {
     connectionString: process.env.DATABASE_URL,

@@ -1,17 +1,19 @@
-const debug = require('debug');
-const { Pool } = require('pg');
-const dotenv = require('dotenv');
+const debug = require("debug");
+const { Pool } = require("pg");
+const dotenv = require("dotenv");
 
 dotenv.config();
-const log = debug('dev');
+const log = debug("dev");
 
 const pool = new Pool({
-  connectionString: process.env.NODE_ENV === 'test'
-    ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL,
+  connectionString:
+    process.env.NODE_ENV === "test"
+      ? process.env.TEST_DATABASE_URL
+      : process.env.DATABASE_URL,
 });
 
-pool.on('connect', () => {
-  log('connected to the db');
+pool.on("connect", () => {
+  log("connected to the db");
 });
 
 // pool.on('remove', () => {
@@ -20,13 +22,13 @@ pool.on('connect', () => {
 // });
 
 /**
-  * @function query
-  * @description queries the db
-  * @param {string} queryString - the query string
-  * @param {any []} values - an array with values
-  * for items specified as parameters in the query string
-  * @returns {*} nothing
-  */
+ * @function query
+ * @description queries the db
+ * @param {string} queryString - the query string
+ * @param {any []} values - an array with values
+ * for items specified as parameters in the query string
+ * @returns {*} nothing
+ */
 const query = (queryString, values = []) => {
   try {
     return pool.query(queryString, values);
@@ -37,7 +39,7 @@ const query = (queryString, values = []) => {
   }
 };
 
-module.exports={
-    query,
-    pool
+module.exports = {
+  query,
+  pool,
 };

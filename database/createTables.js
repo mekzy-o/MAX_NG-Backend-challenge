@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-const dbClient = require('./index');
+const dbClient = require("./index");
 
 const queryString = `
 CREATE TABLE IF NOT EXISTS Comments(

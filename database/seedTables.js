@@ -1,5 +1,5 @@
-const moment = require('moment');
-const dbClient = require('./index');
+const moment = require("moment");
+const dbClient = require("./index");
 
 const queryString = `
         
