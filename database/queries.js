@@ -22,7 +22,7 @@ const addComment = (req) => {
     moment(new Date()),
     ipAddress,
     req.body.comment,
-    parseInt(req.body.filmID),
+    parseInt(req.params.id),
   ];
   const response = pool.query(queryText, values);
   return response;

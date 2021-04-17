@@ -6,6 +6,7 @@ const {
   sortByAscending,
   sortByDescending,
 } = require("../utils/sortCharacters");
+const { addComment } = require("../database/queries");
 
 /* GET movies listing. */
 router.get("/", (_, res, next) => {
@@ -39,6 +40,7 @@ router.get("/", (_, res, next) => {
     });
 });
 
+//Endpoint to get character in a movie by passing in a film id
 router.get("/:id/characters", (req, res) => {
   const { id } = req.params;
   const moviesUrl = `https://swapi.dev/api/films/${id}`;
@@ -76,6 +78,31 @@ router.get("/:id/characters", (req, res) => {
       });
     })
     .catch((error) => console.log(error));
+});
+
+// Endpoint to add comments to a movie
+/*
+  Due to limited time, I did not map the comment count to movies list gotten from swap
+*/
+
+router.post("/:id/comments", (req, res) => {
+  const addMovieComment = addComment(req);
+  addMovieComment
+    .then((result) => {
+      res.status(200).json({
+        success: true,
+        error: false,
+        message: "comments posted to movie successfully!",
+        data: result.rows,
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        message: error.message,
+        status: "error",
+        data: null,
+      });
+    });
 });
 
 module.exports = router;
