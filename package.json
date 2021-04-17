@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "lint-fix": "eslint ./ --fix",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "node ./bin/www",
     "dev": "export DEBUG=dev && nodemon ./bin/www",
